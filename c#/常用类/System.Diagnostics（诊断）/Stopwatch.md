@@ -84,3 +84,54 @@ static void Main(string[] args)
 ```
 
 通过这个类可以更精确地获取到运行时间。
+
+下面封装一个程序运行时间的类 - OperateTimer
+
+```c#
+public sealed class OperatorTimer
+{
+    private Stopwatch watcher { get; set; }
+
+    public OperatorTimer()
+    {
+
+    }
+    public int GetOperateTime(Action action)
+    {
+        watcher = Stopwatch.StartNew();
+        action();
+        watcher.Stop();
+        return watcher.Elapsed.Seconds;
+    }
+}
+
+```
+
+还有另一种写法，我们可以指定 OperateTimer类是非托管的资源，继承 IDispose接口，在对象释放的时候，获取对象存在的时间，从而获取程序运行时间。
+
+```c#
+public sealed class OperatorTimer:IDisposable
+{
+    private Stopwatch watcher { get; set; }
+
+    public OperatorTimer()
+    {
+        watcher = Stopwatch.StartNew();
+    }
+
+    public void Dispose()
+    {
+        watcher.Stop();
+        Console.WriteLine("运行时间 - {0}", watcher.Elapsed.Seconds);
+    }
+}
+
+//用法
+using (new OperatorTimer())
+{
+    //这里边写用于测试运行时间的代码
+    Thread.Sleep(4000);
+}
+
+```
+
